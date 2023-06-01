@@ -43,28 +43,28 @@ void setup() {
   attachInterrupt(0, ENC_LEFT_ISR, RISING);
   attachInterrupt(1, ENC_RIGHT_ISR, RISING);
 
-  while (millis() < 5000) {
-    static byte x = 0;
-    speedLeftPID();
-    car.setMotorLeft(setSpeedLeft, 1);
-    PWM_LEFT_SAMPLE[10] -= PWM_LEFT_SAMPLE[x];
-    PWM_LEFT_SAMPLE[x] = setSpeedLeft;
-    PWM_LEFT_SAMPLE[10] += PWM_LEFT_SAMPLE[x];
-    delay(10);
+  // while (millis() < 5000) {
+  //   static byte x = 0;
+  //   speedLeftPID();
+  //   car.setMotorLeft(setSpeedLeft, 1);
+  //   PWM_LEFT_SAMPLE[10] -= PWM_LEFT_SAMPLE[x];
+  //   PWM_LEFT_SAMPLE[x] = setSpeedLeft;
+  //   PWM_LEFT_SAMPLE[10] += PWM_LEFT_SAMPLE[x];
+  //   delay(10);
     
-    speedRightPID();
-    car.setMotorRight(setSpeedRight, 1);
-    PWM_RIGHT_SAMPLE[10] -= PWM_RIGHT_SAMPLE[x];
-    PWM_RIGHT_SAMPLE[x] = setSpeedRight;
-    PWM_RIGHT_SAMPLE[10] += PWM_RIGHT_SAMPLE[x];
-    delay(10);
-    x = (x + 1) % 10;
-  }
-  setSpeedLeft = PWM_LEFT_SAMPLE[10] / 10;
-  setSpeedRight = PWM_RIGHT_SAMPLE[10] / 10;
-  car.setMotorLeft(0, 1);
-  car.setMotorRight(0, 1);
-  delay(1000);
+  //   speedRightPID();
+  //   car.setMotorRight(setSpeedRight, 1);
+  //   PWM_RIGHT_SAMPLE[10] -= PWM_RIGHT_SAMPLE[x];
+  //   PWM_RIGHT_SAMPLE[x] = setSpeedRight;
+  //   PWM_RIGHT_SAMPLE[10] += PWM_RIGHT_SAMPLE[x];
+  //   delay(10);
+  //   x = (x + 1) % 10;
+  // }
+  // setSpeedLeft = PWM_LEFT_SAMPLE[10] / 10;
+  // setSpeedRight = PWM_RIGHT_SAMPLE[10] / 10;
+  // car.setMotorLeft(0, 1);
+  // car.setMotorRight(0, 1);
+  // delay(1000);
 }
 
 void ENC_LEFT_ISR() {
