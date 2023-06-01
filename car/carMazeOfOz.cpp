@@ -139,8 +139,9 @@ ISR (PCINT0_vect) {
 
 void carMazeOfOz::setMotorLeft(byte speed, bool direction) {
   speed = constrain(speed, MIN_PWM, MAX_PWM);
-  digitalWrite(IN4, direction);
-  analogWrite(IN3, abs(255 * direction - speed));
+  digitalWrite(IN3, direction);
+//  analogWrite(IN4, abs(255 * direction - speed));
+  analogWrite(IN4, speed);
 }
 void carMazeOfOz::setMotorRight(byte speed, bool direction) {
   speed = constrain(speed, MIN_PWM, MAX_PWM);
