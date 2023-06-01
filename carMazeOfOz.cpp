@@ -7,6 +7,7 @@
 #define MIN_PWM 0
 #define STEP_TIME_64 4e-6
 #define TIMER1_STEP_CYCLE 65536
+#define MAX_Distance 10
 
 const byte IN1 = 4;
 const byte IN2 = 5;
@@ -29,11 +30,13 @@ volatile byte allSensor = 0;
 volatile bool headHigh = false, leftHigh = false, rightHigh = false;
 volatile bool headIsRec = false;
 
-carMazeOfOz::carMazeOfOz() {
+carMazeOfOz::carMazeOfOz()
+{
   ;
 }
 
-void carMazeOfOz::setPin() {
+void carMazeOfOz::setPin()
+{
   pinMode(IN1, OUTPUT);
   pinMode(IN2, OUTPUT);
   pinMode(IN3, OUTPUT);
@@ -46,7 +49,8 @@ void carMazeOfOz::setPin() {
   pinMode(echoRight, INPUT);
 }
 
-void carMazeOfOz::setInterrupt() {
+void carMazeOfOz::setInterrupt()
+{
   cli();
   TCCR1A = 0;
   TCCR1B = 0;
@@ -69,32 +73,43 @@ void carMazeOfOz::setInterrupt() {
   distanceRight_SAMPLE[10] = 100;
 }
 
-ISR (TIMER1_OVF_vect) {
+ISR(TIMER1_OVF_vect)
+{
   TCNT1 = 0;
 }
 
-ISR (PCINT0_vect) {
-  if (digitalRead(echoHead) != headHigh) {
-    if (headHigh){
+ISR(PCINT0_vect)
+{
+  if (digitalRead(echoHead) != headHigh)
+  {
+    if (headHigh)
+    {
       static byte i = 0;
       distanceHead_SAMPLE[10] -= distanceHead_SAMPLE[i];
       distanceHead_SAMPLE[i] = (TCNT1 - currentSensorHead + TIMER1_STEP_CYCLE) % TIMER1_STEP_CYCLE;
-      distanceHead_SAMPLE[10] += distanceHead_SAMPLE[i];
-      distanceHead = ((SOUND_SPEED * STEP_TIME_64) * (distanceHead_SAMPLE[10] / 10)) / 2;
-      rateOfChangeDistanceHead_SAMPLE[10] -= rateOfChangeDistanceHead_SAMPLE[i];
-      rateOfChangeDistanceHead_SAMPLE[i] = distanceHead - lastDistanceHead;
-      rateOfChangeDistanceHead_SAMPLE[10] += rateOfChangeDistanceHead_SAMPLE[i];
-      rateOfChangeDistanceHead = rateOfChangeDistanceHead_SAMPLE[10];
-      lastDistanceHead = distanceHead;
-      i = (i + 1) % 10;
-      ++allSensor;
-    } else {
+      if ((distanceHead_SAMPLE[i]>lastDistanceHead) ? 1:-1*(distanceHead_SAMPLE[i] - lastDistanceHead) <= MAX_Distance)
+      {
+        distanceHead_SAMPLE[10] += distanceHead_SAMPLE[i];
+        distanceHead = ((SOUND_SPEED * STEP_TIME_64) * (distanceHead_SAMPLE[10] / 10)) / 2;
+        rateOfChangeDistanceHead_SAMPLE[10] -= rateOfChangeDistanceHead_SAMPLE[i];
+        rateOfChangeDistanceHead_SAMPLE[i] = distanceHead - lastDistanceHead;
+        rateOfChangeDistanceHead_SAMPLE[10] += rateOfChangeDistanceHead_SAMPLE[i];
+        rateOfChangeDistanceHead = rateOfChangeDistanceHead_SAMPLE[10];
+        lastDistanceHead = distanceHead;
+        i = (i + 1) % 10;
+        ++allSensor;
+      }
+    }
+    else
+    {
       currentSensorHead = TCNT1;
     }
     headHigh = !headHigh;
   }
-  if (digitalRead(echoLeft) != leftHigh) {
-    if (leftHigh) {
+  if (digitalRead(echoLeft) != leftHigh)
+  {
+    if (leftHigh)
+    {
       static byte i = 0;
       distanceLeft_SAMPLE[10] -= distanceLeft_SAMPLE[i];
       distanceLeft_SAMPLE[i] = (TCNT1 - currentSensorLeft + TIMER1_STEP_CYCLE) % TIMER1_STEP_CYCLE;
@@ -107,13 +122,17 @@ ISR (PCINT0_vect) {
       lastDistanceLeft = distanceLeft;
       i = (i + 1) % 10;
       ++allSensor;
-    } else {
-      currentSensorLeft = TCNT1; 
+    }
+    else
+    {
+      currentSensorLeft = TCNT1;
     }
     leftHigh = !leftHigh;
   }
-  if (digitalRead(echoRight) != rightHigh) {
-    if (rightHigh) {
+  if (digitalRead(echoRight) != rightHigh)
+  {
+    if (rightHigh)
+    {
       static byte i = 0;
       distanceRight_SAMPLE[10] -= distanceRight_SAMPLE[i];
       distanceRight_SAMPLE[i] = (TCNT1 - currentSensorRight + TIMER1_STEP_CYCLE) % TIMER1_STEP_CYCLE;
@@ -126,76 +145,98 @@ ISR (PCINT0_vect) {
       lastDistanceRight = distanceRight;
       i = (i + 1) % 10;
       ++allSensor;
-    } else {
-      currentSensorRight = TCNT1; 
+    }
+    else
+    {
+      currentSensorRight = TCNT1;
     }
     rightHigh = !rightHigh;
   }
-  if (allSensor == 3) {
+  if (allSensor == 3)
+  {
     allSensor = 0;
     digitalWrite(trig, HIGH);
   }
 }
 
-void carMazeOfOz::setMotorLeft(byte speed, bool direction) {
+void carMazeOfOz::setMotorLeft(byte speed, bool direction)
+{
   speed = constrain(speed, MIN_PWM, MAX_PWM);
   digitalWrite(IN4, direction);
   analogWrite(IN3, abs(255 * direction - speed));
 }
-void carMazeOfOz::setMotorRight(byte speed, bool direction) {
+void carMazeOfOz::setMotorRight(byte speed, bool direction)
+{
   speed = constrain(speed, MIN_PWM, MAX_PWM);
   digitalWrite(IN1, direction);
   analogWrite(IN2, abs(255 * direction - speed));
 }
 
-void carMazeOfOz::setSpeedLeft(volatile float speed) {
+void carMazeOfOz::setSpeedLeft(volatile float speed)
+{
   speedValueLeft = speed;
 }
 
-void carMazeOfOz::setSpeedRight(volatile float speed) {
+void carMazeOfOz::setSpeedRight(volatile float speed)
+{
   speedValueRight = speed;
 }
 
-float carMazeOfOz::getSpeedLeft() {
+float carMazeOfOz::getSpeedLeft()
+{
   return speedValueLeft;
 }
 
-float carMazeOfOz::getSpeedRight() {
+float carMazeOfOz::getSpeedRight()
+{
   return speedValueRight;
 }
 
-float carMazeOfOz::getDistanceHead() {
+float carMazeOfOz::getDistanceHead()
+{
   return distanceHead;
 }
 
-float carMazeOfOz::getDistanceLeft() {
+float carMazeOfOz::getDistanceLeft()
+{
   return distanceLeft;
 }
 
-float carMazeOfOz::getDistanceRight() {
+float carMazeOfOz::getDistanceRight()
+{
   return distanceRight;
 }
 
-float carMazeOfOz::getRateOfChangeDistanceHead() {
+float carMazeOfOz::getRateOfChangeDistanceHead()
+{
   return rateOfChangeDistanceHead;
 }
-float carMazeOfOz::getRateOfChangeDistanceLeft() {
+float carMazeOfOz::getRateOfChangeDistanceLeft()
+{
   return rateOfChangeDistanceLeft;
 }
-float carMazeOfOz::getRateOfChangeDistanceRight() {
+float carMazeOfOz::getRateOfChangeDistanceRight()
+{
   return rateOfChangeDistanceRight;
 }
 
-void carMazeOfOz::configureSpeed(volatile float &speedValueLeft, volatile float &speedValueRight) {
+void carMazeOfOz::configureSpeed(volatile float &speedValueLeft, volatile float &speedValueRight)
+{
   static byte countStopLeft = 0, countStopRight = 0;
   static float lastSpeedValueLeft = speedValueLeft;
   static float lastSpeedValueRight = speedValueRight;
-  if (lastSpeedValueLeft == speedValueLeft) countStopLeft++;
-  else countStopLeft = 0;
-  if (lastSpeedValueRight == speedValueRight) countStopRight++;
-  else countStopRight = 0;
-  if (countStopLeft > 10) speedValueLeft = 0;
-  if (countStopRight > 10) speedValueRight = 0;
+  if (lastSpeedValueLeft == speedValueLeft)
+    countStopLeft++;
+  else
+    countStopLeft = 0;
+  if (lastSpeedValueRight == speedValueRight)
+    countStopRight++;
+  else
+    countStopRight = 0;
+  if (countStopLeft > 10)
+    speedValueLeft = 0;
+  if (countStopRight > 10)
+    speedValueRight = 0;
   lastSpeedValueLeft = speedValueLeft;
   lastSpeedValueRight = speedValueRight;
 }
