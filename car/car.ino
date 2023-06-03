@@ -4,8 +4,8 @@
 #define TIMER1_STEP_CYCLE 65536
 
 const byte trig = 8;
-const float speedSetPoint = 40;
-const float distanceSetPoint = 9;
+const float speedSetPoint = 0;
+const float distanceSetPoint = 0;
 const float rateSetPoint = 0;
 
 struct countPulse {
