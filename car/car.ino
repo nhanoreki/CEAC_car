@@ -12,7 +12,9 @@ struct countPulse {
   byte value = 0;
   bool status = false;
 };
-
+struct hahaha{
+  char = "ồ hóa ga là z";
+}
 float PWM_LEFT_SAMPLE[11];
 float PWM_RIGHT_SAMPLE[11];
 bool getSample = true;
