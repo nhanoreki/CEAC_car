@@ -3,10 +3,14 @@
 #define STEP_TIME_64 4e-6
 #define TIMER1_STEP_CYCLE 65536
 
+
+
 const byte trig = 8;
-const float speedSetPoint = 70;
-const float distanceSetPoint = 9;
+const float BaseSpeed = 70;
+const float distanceSetPoint = 7;
 const float rateSetPoint = 0;
+
+
 
 struct countPulse {
   byte value = 0;
@@ -32,9 +36,18 @@ byte setSpeedLeft;
 byte setSpeedRight;
 float setDistance;
 float setRate;
-
+float PID;
+float pre_error = 0;
 
 //--------------------------------------------------//
+
+//----PID set-----------//
+
+float Kp = 12, Ki = 0, Kd = 0;
+float P;
+float I = 0;
+float D;
+
 
 void setup() {
   Serial.begin(9600);
@@ -97,35 +110,53 @@ void ENC_RIGHT_ISR() {
 
 // Your functions is in the area below
 //--------------------------------------------------//
-void speedLeftPID() {
-  float Kp = 100, Ki = 1;
-  float e = speedSetPoint - car.getSpeedLeft();
-  float P = Kp * e;
-  static float I = 0;
-  I += Ki * e;
-  setSpeedLeft = constrain(P + I, 0, 255);
-}
-
-void speedRightPID() {
-  float Kp = 1, Ki = 0.2;
-  float e = speedSetPoint - car.getSpeedRight();
-  float P = Kp * e;
-  static float I = 0;
-  I += Ki * e;
-  setSpeedRight = constrain(P + I, 0, 255);
-}
+//void speedLeftPID() {
+//  float Kp = 1, Ki = 0.2;
+//  float e = speedSetPoint - car.getSpeedLeft();
+//  float P = Kp * e;
+//  static float I = 0;
+//  I += Ki * e;
+//  setSpeedLeft = constrain(P + I, 0, 255);
+//}
+//
+//void speedRightPID() {
+//  float Kp = 1, Ki = 0.2;
+//  float e = speedSetPoint - car.getSpeedRight();
+//  float P = Kp * e;
+//  static float I = 0;
+//  I += Ki * e;
+//  setSpeedRight = constrain(P + I, 0, 255);
+//}
 
 void distancePID() {
-  float Kp = 2, Ki = 0.25;
+ 
   float e = distanceSetPoint - car.getDistanceLeft();
-  float P = Kp * e;
-  static float I = 0;
+  P = Kp * e;
   if (e > -0.5 && e < 0.5) {
     I = 0;
   } else {
     I += Ki * e;
   }
-  setDistance = constrain(P + I, -50, 50);
+  D = pre_error * Kd;
+  pre_error = e;
+  // setDistance = constrain(P + I, -50, 50);
+  PID = constrain(P + I + D, -70, 70);
+  int left = BaseSpeed + PID;
+  int right =  BaseSpeed - PID; 
+  if (left < 0)
+  {
+      left = - 1 * left;
+      car.setMotorLeft(left, 0);
+  }
+  else 
+    car.setMotorLeft(left, 1);
+  if (right < 0)
+  {
+      right = - 1 * right;
+      car.setMotorRight(right, 0);
+  }
+  else 
+    car.setMotorRight(right, 1);
 }
 
 void rateOfChangeDistancePID() {
@@ -139,6 +170,7 @@ void rateOfChangeDistancePID() {
     I += Ki * e;
   }
   setRate = constrain(P + I, -50, 50);
+
 }
 
 void stopMotor() {
@@ -151,19 +183,22 @@ void stopMotor() {
 
 void loop() {
   digitalWrite(trig, LOW);
-  car.setSpeedLeft(speedValueLeft);
+    car.setSpeedLeft(speedValueLeft);
   car.setSpeedRight(speedValueRight);
   car.configureSpeed(speedValueLeft, speedValueRight);
 
   // Your code is in the area below
   //--------------------------------------------------//
-  car.setMotorRight(setSpeedRight, 1);
-  speedRightPID();
-  car.setMotorLeft(255, 1);
-  speedLeftPID();
-//  Serial.print(car.getSpeedRight());
+  distancePID(); 
+//  car.setMotorLeft(150, 1);
+  
+  Serial.print(car.getSpeedLeft());
+  Serial.print(" ");
+  Serial.println(car.getSpeedRight());
 //  Serial.print(" ");
-  Serial.println(car.getSpeedLeft());
+//  Serial.print(car.getDistanceHead());
+//  Serial.print(" ");
+//  Serial.println(car.getDistanceRight());
   
   //--------------------------------------------------//
 }
