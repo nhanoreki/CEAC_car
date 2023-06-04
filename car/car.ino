@@ -43,7 +43,7 @@ float pre_error = 0;
 
 //----PID set-----------//
 
-float Kp = 12, Ki = 0, Kd = 0;
+float Kp = 10, Ki = 0.05, Kd = 1.2; // 3 0.05 1 // 10 0.05 1.2
 float P;
 float I = 0;
 float D;
@@ -140,7 +140,7 @@ void distancePID() {
   D = pre_error * Kd;
   pre_error = e;
   // setDistance = constrain(P + I, -50, 50);
-  PID = constrain(P + I + D, -70, 70);
+  PID = constrain(P + I + D, -100, 100);
   int left = BaseSpeed + PID;
   int right =  BaseSpeed - PID; 
   if (left < 0)
@@ -191,10 +191,18 @@ void loop() {
   //--------------------------------------------------//
   distancePID(); 
 //  car.setMotorLeft(150, 1);
-  
-  Serial.print(car.getSpeedLeft());
-  Serial.print(" ");
-  Serial.println(car.getSpeedRight());
+  if (car.getDistanceHead() < 10 && car.getDistanceLeft() < 10)
+  {
+    car.setMotorRight(175, 0);
+    car.setMotorLeft(255, 1);
+    delay(150);
+  }
+  else if (car.getDistanceHead() < 5)
+  {
+      car.setMotorRight(175, 0);
+      car.setMotorLeft(255, 1);
+      delay(200);
+  }
 //  Serial.print(" ");
 //  Serial.print(car.getDistanceHead());
 //  Serial.print(" ");
