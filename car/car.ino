@@ -157,48 +157,50 @@ void loop() {
 
   // Your code is in the area below
   //--------------------------------------------------//
-  if (turnFinish) {
-    if (car.getDistanceRight() > 25) {
-      turn.status = true;
-      turnRight = true;
-    } else if (car.getDistanceHead() < 10){
-      turn.status = true;
-      turnRight = false;
-    }
-    if (turn.status) {
-      turnFinish = false;
-    }
-  }
-  if (turn.status) {
-    if (turnRight) {
-      car.setMotorLeft(setSpeedLeft + 10, 1);
-      car.setMotorRight(setSpeedRight + 10, 0);
-    } else {
-      car.setMotorLeft(setSpeedLeft + 10, 0);
-      car.setMotorRight(setSpeedRight + 10, 1);
-    }
-  } else {
-    car.setMotorLeft(setSpeedLeft, 1);
-    car.setMotorRight(setSpeedRight, 1);
-  }
-  if (turn.value > 45) {
-    turn.status = false;
-    turn.value = 0;
-    turnFinish = true;
-    if (car.getDistanceHead() > 10) {
-      car.setMotorLeft(setSpeedLeft, 1);
-      car.setMotorRight(setSpeedRight, 1);
-      delay(550);
-    }
-  }
-  if (car.getDistanceHead() > 500) {
-    car.setMotorLeft(setSpeedLeft, 0);
-    car.setMotorRight(setSpeedRight, 0);
-    delay(100);
-  }
-  Serial.print(car.getDistanceHead());
-  Serial.print(" ");
-  Serial.println(car.getDistanceRight());
+//  if (turnFinish) {
+//    if (car.getDistanceRight() > 25) {
+//      turn.status = true;
+//      turnRight = true;
+//    } else if (car.getDistanceHead() < 10){
+//      turn.status = true;
+//      turnRight = false;
+//    }
+//    if (turn.status) {
+//      turnFinish = false;
+//    }
+//  }
+//  if (turn.status) {
+//    if (turnRight) {
+//      car.setMotorLeft(setSpeedLeft + 10, 1);
+//      car.setMotorRight(setSpeedRight + 10, 0);
+//    } else {
+//      car.setMotorLeft(setSpeedLeft + 10, 0);
+//      car.setMotorRight(setSpeedRight + 10, 1);
+//    }
+//  } else {
+//    car.setMotorLeft(setSpeedLeft, 1);
+//    car.setMotorRight(setSpeedRight, 1);
+//  }
+//  if (turn.value > 45) {
+//    turn.status = false;
+//    turn.value = 0;
+//    turnFinish = true;
+//    if (car.getDistanceHead() > 10) {
+//      car.setMotorLeft(setSpeedLeft, 1);
+//      car.setMotorRight(setSpeedRight, 1);
+//      delay(550);
+//    }
+//  }
+//  if (car.getDistanceHead() > 500) {
+//    car.setMotorLeft(setSpeedLeft, 0);
+//    car.setMotorRight(setSpeedRight, 0);
+//    delay(100);
+//  }
+//  Serial.print(car.getDistanceHead());
+//  Serial.print(" ");
+//  Serial.println(car.getDistanceRight());
+
+  car.setMotorLeft(255, 1);
   
   //--------------------------------------------------//
 }

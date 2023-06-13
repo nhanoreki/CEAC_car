@@ -8,10 +8,10 @@
 #define STEP_TIME_64 4e-6
 #define TIMER1_STEP_CYCLE 65536
 
-const byte IN1 = 7;
-const byte IN2 = 6;
-const byte IN3 = 5;
-const byte IN4 = 4;
+const byte IN1 = 4;
+const byte IN2 = 5;
+const byte IN3 = 6;
+const byte IN4 = 7;
 const byte encLeft = 2;
 const byte encRight = 3;
 const byte trig = 8;
@@ -140,7 +140,7 @@ ISR (PCINT0_vect) {
 void carMazeOfOz::setMotorLeft(byte speed, bool direction) {
   speed = constrain(speed, MIN_PWM, MAX_PWM);
   digitalWrite(IN4, direction);
-  analogWrite(IN3, speed);
+  analogWrite(IN3, abs(255 * direction - speed));
 }
 void carMazeOfOz::setMotorRight(byte speed, bool direction) {
   speed = constrain(speed, MIN_PWM, MAX_PWM);
